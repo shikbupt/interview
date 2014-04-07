@@ -96,10 +96,69 @@ namespace qh
         return sub_url;
     }
 
+	void GetEqualsPositions(const std::string& raw_url, std::vector<int>& positions)
+	{
+		char* equals = "=";
+		for (std::string::size_type index = raw_url.size()-1; index != 0; --index) {
+			if (!strncmp(&raw_url[index], equals, 1)) {
+				positions.push_back(index);
+			}
+		}
+	}
+
+	int FindForwardMaxAlphaSegment(const std::string& raw_url, int equals_position)
+	{
+		int max_position = equals_position;
+		for (std::string::size_type index = equals_position-1; index != 0; --index) {
+			if (isalpha(raw_url[index])) {
+				max_position = index;
+			}
+			else{
+				break;
+			}
+		}
+		return max_position;
+	}
+
+	void ExtractSubUrl(const std::string& raw_url, int equals_position, std::string& sub_url)
+	{
+		char* ends = "&";
+		for (std::string::size_type index = equals_position+1; index != raw_url.size(); ++index) {
+			if (!strncmp(&raw_url[index], ends, 1)) {
+				sub_url = raw_url.substr(equals_position+1, index-equals_position-1);
+				return;
+			}
+		}
+		sub_url = raw_url.substr(equals_position+1);
+	}
+
     void ProxyURLExtractor::Extract( const KeyItems& keys, const std::string& raw_url, std::string& sub_url )
     {
 #if 1
         //TODO 请面试者在这里添加自己的代码实现以完成所需功能
+		//先寻找“=”所在的位置，按出现位置向前寻找最大的字母段，将字母段与keys中关键词比较
+		//发现关键词再以“=”所在的位置为中心向后查找，直到出现“&”或结尾，此时提取即为suburl。
+		if (raw_url.empty() || keys.empty()) {
+			//printf("raw_url/keys 无输入");
+			return;
+		}
+		using std::vector;
+		vector<int> equals_positions;
+		GetEqualsPositions(raw_url, equals_positions);
+		if (equals_positions.empty()) {
+			return;
+		} 		
+		for (vector<int>::iterator iter = equals_positions.begin(); 
+			iter != equals_positions.end(); ++iter) {
+				int alpha_segment_pos = FindForwardMaxAlphaSegment(raw_url, *iter);
+				if (keys.count(raw_url.substr(alpha_segment_pos, *iter-alpha_segment_pos)) != 0) {
+					ExtractSubUrl(raw_url, *iter, sub_url);
+					if (!sub_url.empty()) {
+						return;
+					}
+				}
+		}
+		
 #else
         //这是一份参考实现，但在特殊情况下工作不能符合预期
         Tokener token(raw_url);

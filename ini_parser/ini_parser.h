@@ -2,9 +2,15 @@
 #define QIHOO_INI_PARSER_H_
 
 #include <string>
+#include <map>
+#include <vector>
+
 
 namespace qh
 {
+	using std::map;
+	using std::string;
+	using std::vector;
     class INIParser
     {
     public:
@@ -37,8 +43,18 @@ namespace qh
         const std::string& Get(const std::string& section, const std::string& key, bool* found);
 
     private:
+
+		//! \brief 从ini_data中提取每一行放入ini_data中
+		void GetINIDataLine(const string& ini_data, vector<string>& line_data, const std::string& line_seperator);
+
+		//! \brief 生成ini_data_struct_结构
+		bool GetINIDataStruct(const vector<string>& line_data, const std::string& key_value_seperator);
+
+		typedef map<string, map<string, string> > INI_DATA_STRUCT;
+		INI_DATA_STRUCT ini_data_struct_;
+		string* no_found_str;
     };
-}
+} 
 
 #endif
 

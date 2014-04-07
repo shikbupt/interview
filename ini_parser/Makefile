@@ -1,29 +1,16 @@
-# weizili@360.cn 
+#all: main
 
-CC=gcc
-CXX=g++
-CFLAGS= -g -c -D_DEBUG -fPIC -Wshadow -Wcast-qual -Wcast-align -Wwrite-strings -Wsign-compare -Winvalid-pch -fms-extensions -Wall -MMD
-CPPFLAGS=$(CFLAGS) -Woverloaded-virtual -Wsign-promo -fno-gnu-keywords 
 
-SRCS := $(wildcard *.cc) 
-OBJS := $(patsubst %.cc, %.o, $(SRCS))
-DEPS := $(patsubst %.o, %.d, $(OBJS))
+main: main.o ini_parser.o  
+	g++ -g main.o ini_parser.o -o  main  
 
-TARGET=unittest_iniparser
+ini_parser.o: ini_parser.cc
+	g++ -g -c ini_parser.cc
 
-all : $(TARGET) 
+main.o: main.cc
+	g++ -g -c main.cc
 
-check : $(TARGET)
-	./$^
 
-$(TARGET) : $(OBJS)
-	$(CXX) $(OBJS) $(LDFLAGS) -o $@
-
--include $(DEPS)
-
-%.o : %.cc
-	$(CXX) $(CFLAGS) $(CPPFLAGS) $< -o $@
-
-clean:
-	rm -rf *.o *.d $(OBJS) $(DEPS) $(TARGET) 
-
+  
+clean:  
+	-rm main *.o  
