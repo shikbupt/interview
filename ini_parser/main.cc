@@ -1,4 +1,5 @@
 #include "ini_parser.h"
+#include <string.h>
 
 #include <assert.h>
 
@@ -80,7 +81,7 @@ void test4()
 void test5()
 {
 	qh::INIParser parser;
-	if (!parser.Parse("test.ini")) {
+	if (!parser.Parse("./test.ini")) {
 		assert(false);
 	}
 	bool found;
